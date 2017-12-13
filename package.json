@@ -1,0 +1,32 @@
+{
+  "name": "loopback-api",
+  "version": "1.0.0",
+  "description": "Loopback API",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "debug": "^3.1.0",
+    "request-promise": "^4.2.2",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stefano31/loopbackAPI.git"
+  },
+  "keywords": [
+    "loopback",
+    "API"
+  ],
+  "author": "Stefano Giurgiano",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Stefano31/loopbackAPI/issues"
+  },
+  "homepage": "https://github.com/Stefano31/loopbackAPI#readme"
+}
