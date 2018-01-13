@@ -141,6 +141,24 @@ class LoopbackModel {
         }
         return response;
     }
+
+    async delete(where) {
+        var response = false;
+        try{
+            response = await request.delete({
+                uri: this.url,
+                qs: {
+                    where: where
+                },
+                json: true
+            });
+            this.debug('delete: ', response);
+        }
+        catch(e){
+            this.debug('ERROR: ', e.error.error);
+        }
+        return response;
+    }
 }
 
 
