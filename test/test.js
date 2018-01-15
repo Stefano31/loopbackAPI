@@ -58,6 +58,8 @@ async function initTests(){
     debug('testing customModel...');
     await Custom.merge();
 
+    await Leads.delete({id: {gte: 8}});
+
     return true;
 }
 

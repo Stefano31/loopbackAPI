@@ -147,7 +147,7 @@ class LoopbackModel {
         try{
             response = await request.delete({
                 uri: this.url,
-                qs: {
+                body: {
                     where: where
                 },
                 json: true
