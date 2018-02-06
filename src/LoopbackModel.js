@@ -6,8 +6,17 @@ class LoopbackModel {
 
     constructor(model, loopbackApi) {
         this.debug = require('debug')(`LP:MODEL:${model}`);
+        this.loopbackApi = loopbackApi;
         this.url = loopbackApi.getUrl() + '/' + model;
         this.model = model;
+    }
+
+    _initQsWithToken(){
+        var qs = {};
+        if(this.loopbackApi.accessToken){
+            qs.access_token = this.loopbackApi.accessToken;
+        }
+        return qs;
     }
 
     // OK
@@ -16,6 +25,7 @@ class LoopbackModel {
         var response = false;
         try{
             response = await request.get({
+                qs: this._initQsWithToken(),
                 uri: url,
                 json: true
             });
@@ -29,27 +39,41 @@ class LoopbackModel {
 
     // OK
     async create(data) {
-        const url = `${this.url}`;
-        var response = await request.post({
-            uri: url,
-            body: data,
-            json: true
-        });
-        this.debug('create: ', response);
+        var response = false;
+        try{
+            const url = `${this.url}`;
+            response = await request.post({
+                qs: this._initQsWithToken(),
+                uri: url,
+                body: data,
+                json: true
+            });
+            this.debug('create: ', response);
+        }
+        catch(e){
+            this.debug('response: ', e);
+            this.debug('ERROR: ', e.error.error);
+        }
         return response;
     }
 
     // OK
     async count(where) {
-        const url = `${this.url}/count`;
-        var response = await request.get({
-            uri: url,
-            qs: {
-                where: where
-            },
-            json: true
-        });
-        this.debug('count: ', response);
+        var response = false;
+        try{
+            const url = `${this.url}/count`;
+            var qs = this._initQsWithToken();
+            qs.where = where;
+            response = await request.get({
+                uri: url,
+                qs: qs,
+                json: true
+            });
+            this.debug('count: ', response);
+        }
+        catch(e){
+            this.debug('ERROR: ', e.error.error);
+        }
         return response;
     }
 
@@ -59,6 +83,7 @@ class LoopbackModel {
         var response = false;
         try{
             response = await request.patch({
+                qs: this._initQsWithToken(),
                 uri: url,
                 body: data,
                 json: true
@@ -72,15 +97,21 @@ class LoopbackModel {
     }
 
     async find(filter) {
-        const url = `${this.url}`;
-        var response = await request.get({
-            uri: url,
-            qs: {
-                filter: filter
-            },
-            json: true
-        });
-        this.debug('find: ', response);
+        var response = false;
+        try{
+            const url = `${this.url}`;
+            var qs = this._initQsWithToken();
+            qs.filter = filter;
+            response = await request.get({
+                uri: url,
+                qs: qs,
+                json: true
+            });
+            this.debug('find: ', response);
+        }
+        catch(e){
+            this.debug('ERROR: ', e.error.error);
+        }
         return response;
     }
 
@@ -88,12 +119,12 @@ class LoopbackModel {
     async findOne(query) {
         const url = `${this.url}/findOne`;
         var response = false;
+        var qs = this._initQsWithToken();
+        qs.filter = query;
         try{
             response = await request.get({
                 uri: url,
-                qs: {
-                    filter: query
-                },
+                qs: qs,
                 json: true
             });
             this.debug('findOne: ', response);
@@ -108,12 +139,12 @@ class LoopbackModel {
     async update(where, data){
         const url = `${this.url}/update`;
         var response = false;
+        var qs = this._initQsWithToken();
+        qs.where = where;
         try{
             response = await request.post({
                 uri: url,
-                qs: {
-                    where: where
-                },
+                qs: qs,
                 body: data,
                 json: true
             });
@@ -129,8 +160,10 @@ class LoopbackModel {
     async deleteById(id) {
         const url = `${this.url}/${id}`;
         var response = false;
+        var qs = this._initQsWithToken();
         try{
             response = await request.delete({
+                qs: qs,
                 uri: url,
                 json: true
             });
@@ -144,8 +177,10 @@ class LoopbackModel {
 
     async delete(where) {
         var response = false;
+        var qs = this._initQsWithToken();
         try{
             response = await request.delete({
+                qs: qs,
                 uri: this.url,
                 body: {
                     where: where
