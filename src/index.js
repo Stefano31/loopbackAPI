@@ -1,4 +1,5 @@
 module.exports = {
     LoopbackAPI: require('./LoopbackAPI'), 
-    LoopbackModel: require('./LoopbackModel')
+    LoopbackModel: require('./LoopbackModel'),
+    LoopbackUserModel: require('./LoopbackUserModel')
 };
