@@ -1,6 +1,6 @@
 const LoopbackAPI = require('../src/LoopbackAPI');
 const LoopbackModel = require('../src/LoopbackModel');
-const hive = 'http://localhost:3000/api';
+const hive = 'http://localhost:3100/api';
 const debug = require('debug')('LP:TEST');
 
 class CustomLoopbackModel extends LoopbackModel{
@@ -12,6 +12,7 @@ class CustomLoopbackModel extends LoopbackModel{
 var loopbackAPI = new LoopbackAPI(hive);
 var Leads = loopbackAPI.getModel('Leads');
 var Users = loopbackAPI.getUser('Users');
+var Admins = loopbackAPI.getUser('Admins');
 var Translations = loopbackAPI.getModel('Translations');
 var Custom = new CustomLoopbackModel('Leads', loopbackAPI);
 
@@ -67,8 +68,9 @@ async function initTestsAgents(){
 
 async function initTestsUser(){
     debug('login..');
-    var result = await Users.login('string@live.it', 'ciao');
+    var result = await Admins.login('string@live.it', 'ciao');
     debug('token: ', loopbackAPI.accessToken);
+    await Users.logout();
 }
 
 async function initTests(){
@@ -120,6 +122,6 @@ async function initTests(){
     return true;
 }
 
-initTestsAgents().then(() => {
+initTestsUser().then(() => {
     return;
 });
