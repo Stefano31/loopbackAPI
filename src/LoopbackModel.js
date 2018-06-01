@@ -63,7 +63,7 @@ class LoopbackModel {
         try{
             const url = `${this.url}/count`;
             var qs = this._initQsWithToken();
-            qs.where = where;
+            qs.where = JSON.stringify(where);
             response = await request.get({
                 uri: url,
                 qs: qs,
@@ -101,7 +101,7 @@ class LoopbackModel {
         try{
             const url = `${this.url}`;
             var qs = this._initQsWithToken();
-            qs.filter = filter;
+            qs.filter = JSON.stringify(filter);
             response = await request.get({
                 uri: url,
                 qs: qs,
@@ -120,7 +120,7 @@ class LoopbackModel {
         const url = `${this.url}/findOne`;
         var response = false;
         var qs = this._initQsWithToken();
-        qs.filter = query;
+        qs.filter = JSON.stringify(query);
         try{
             response = await request.get({
                 uri: url,
@@ -140,7 +140,7 @@ class LoopbackModel {
         const url = `${this.url}/update`;
         var response = false;
         var qs = this._initQsWithToken();
-        qs.where = where;
+        qs.where = JSON.stringify(where);
         try{
             response = await request.post({
                 uri: url,
