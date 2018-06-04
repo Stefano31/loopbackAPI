@@ -1,6 +1,6 @@
 'use strict';
 
-const request = require('request-promise');
+const axios = require('axios');
 
 class LoopbackModel {
 
@@ -24,15 +24,14 @@ class LoopbackModel {
         const url = `${this.url}/${id}`;
         var response = false;
         try{
-            response = await request.get({
-                qs: this._initQsWithToken(),
-                uri: url,
-                json: true
+            response = await axios.get(url, {
+                params: this._initQsWithToken(),
             });
+            response = response.data;
             this.debug('findById: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -42,17 +41,14 @@ class LoopbackModel {
         var response = false;
         try{
             const url = `${this.url}`;
-            response = await request.post({
-                qs: this._initQsWithToken(),
-                uri: url,
-                body: data,
-                json: true
+            response = await axios.post(url, data, {
+                params: this._initQsWithToken(),
             });
+            response = response.data;
             this.debug('create: ', response);
         }
         catch(e){
-            this.debug('response: ', e);
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -64,15 +60,14 @@ class LoopbackModel {
             const url = `${this.url}/count`;
             var qs = this._initQsWithToken();
             qs.where = JSON.stringify(where);
-            response = await request.get({
-                uri: url,
-                qs: qs,
-                json: true
+            response = await axios.get(url, {
+                params: qs,
             });
+            response = response.data;
             this.debug('count: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -82,16 +77,14 @@ class LoopbackModel {
         const url = `${this.url}/${id}`;
         var response = false;
         try{
-            response = await request.patch({
-                qs: this._initQsWithToken(),
-                uri: url,
-                body: data,
-                json: true
+            response = await axios.patch(url, data, {
+                params: this._initQsWithToken(),
             });
+            response = response.data;
             this.debug('updateById: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -102,15 +95,12 @@ class LoopbackModel {
             const url = `${this.url}`;
             var qs = this._initQsWithToken();
             qs.filter = JSON.stringify(filter);
-            response = await request.get({
-                uri: url,
-                qs: qs,
-                json: true
-            });
+            response = await axios.get(url, { params: qs });
+            response = response.data;
             this.debug('find: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -122,15 +112,12 @@ class LoopbackModel {
         var qs = this._initQsWithToken();
         qs.filter = JSON.stringify(query);
         try{
-            response = await request.get({
-                uri: url,
-                qs: qs,
-                json: true
-            });
+            response = await axios.get(url, { params: qs });
+            response = response.data;
             this.debug('findOne: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -142,16 +129,12 @@ class LoopbackModel {
         var qs = this._initQsWithToken();
         qs.where = JSON.stringify(where);
         try{
-            response = await request.post({
-                uri: url,
-                qs: qs,
-                body: data,
-                json: true
-            });
+            response = await axios.post(url, data, { params: qs });
+            response = response.data;
             this.debug('update: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -162,15 +145,12 @@ class LoopbackModel {
         var response = false;
         var qs = this._initQsWithToken();
         try{
-            response = await request.delete({
-                qs: qs,
-                uri: url,
-                json: true
-            });
+            response = await axios.delete(url, { params: qs });
+            response = response.data;
             this.debug('deleteById: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -179,18 +159,12 @@ class LoopbackModel {
         var response = false;
         var qs = this._initQsWithToken();
         try{
-            response = await request.delete({
-                qs: qs,
-                uri: this.url,
-                body: {
-                    where: where
-                },
-                json: true
-            });
+            response = await axios.delete(this.url, { where: where }, { params: qs });
+            response = response.data;
             this.debug('delete: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }

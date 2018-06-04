@@ -1,6 +1,6 @@
 'use strict';
 
-const request = require('request-promise');
+const axios = require('axios');
 const LoopbackModel = require('./LoopbackModel');
 
 class LoopbackUserModel extends LoopbackModel {
@@ -9,19 +9,16 @@ class LoopbackUserModel extends LoopbackModel {
         const url = `${this.url}/login`;
         var response = false;
         try{
-            response = await request.post({
-                uri: url,
-                body: {
-                    email: email,
-                    password: password
-                },
-                json: true
+            response = await axios.post(url, {
+                email: email,
+                password: password
             });
+            response = response.data;
             this.debug('login: ', response);
             this.loopbackApi.setAccessToken(response.id);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -31,20 +28,15 @@ class LoopbackUserModel extends LoopbackModel {
         var response = false;
         var qs = this._initQsWithToken();
         try {
-            response = await request.post({
-                uri: url,
-                qs: qs,
-                form: {
-                    oldPassword: oldPassword,
-                    newPassword: newPassword
-                },
-                json: true
-            });
+            response = await axios.post(url, {
+                oldPassword: oldPassword,
+                newPassword: newPassword
+            }, { params: qs });
             response = true;
             this.debug('changePassword: ', response);
         }
         catch (e) {
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -54,16 +46,14 @@ class LoopbackUserModel extends LoopbackModel {
         var response = false;
         var qs = this._initQsWithToken();
         try{
-            response = await request.post({
-                uri: url,
-                qs: qs,
-                json: true
+            response = await axios.post(url, {}, {
+                params: qs
             });
             response = true;
             this.debug('logout: ', response);
         }
         catch(e){
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -72,21 +62,12 @@ class LoopbackUserModel extends LoopbackModel {
         const url = `${this.url}/reset-password`;
         var response = false;
         try {
-            response = await request.post({
-                uri: url,
-                qs: {
-                    access_token: token
-                },
-                form: {
-                    newPassword: newPassword
-                },
-                json: true
-            });
+            response = await axios.post(url, { newPassword: newPassword }, { params: { access_token: token }});
             response = true;
             this.debug('setNewPassword: ', response);
         }
         catch (e) {
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
@@ -95,18 +76,12 @@ class LoopbackUserModel extends LoopbackModel {
         const url = `${this.url}/reset`;
         var response = false;
         try {
-            response = await request.post({
-                uri: url,
-                body: {
-                    email: email
-                },
-                json: true
-            });
+            response = await axios.post(url, { email: email });
             response = true;
             this.debug('resetPassword: ', response);
         }
         catch (e) {
-            this.debug('ERROR: ', e.error.error);
+            this.debug('ERROR: ', e.response.status, e.response.statusText);
         }
         return response;
     }
