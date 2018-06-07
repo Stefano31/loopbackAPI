@@ -158,9 +158,10 @@ class LoopbackModel {
     async delete(where) {
         var response = false;
         var qs = this._initQsWithToken();
+        qs.where = where;
         try{
-            response = await axios.delete(this.url, { where: where }, { params: qs });
-            response = response.data;
+            await axios.delete(this.url, { params: qs });
+            response = true;
             this.debug('delete: ', response);
         }
         catch(e){
