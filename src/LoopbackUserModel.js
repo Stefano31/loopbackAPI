@@ -7,19 +7,13 @@ class LoopbackUserModel extends LoopbackModel {
 
     async login(email, password){
         const url = `${this.url}/login`;
-        var response = false;
-        try{
-            response = await axios.post(url, {
-                email: email,
-                password: password
-            });
-            response = response.data;
-            this.debug('login: ', response);
-            this.loopbackApi.setAccessToken(response.id);
-        }
-        catch(e){
-            this.debug('ERROR: ', e.response.status, e.response.statusText);
-        }
+        let response = await axios.post(url, {
+            email: email,
+            password: password
+        });
+        response = response.data;
+        this.debug('login: ', response);
+        this.loopbackApi.setAccessToken(response.id);
         return response;
     }
 

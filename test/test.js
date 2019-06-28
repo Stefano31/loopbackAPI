@@ -1,127 +1,76 @@
+//During the test the env variable is set to test
+process.env.NODE_ENV = 'test';
+
+//Require the dev-dependencies
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const should = chai.should();
+
+// Require app dependencies
 const LoopbackAPI = require('../src/LoopbackAPI');
 const LoopbackModel = require('../src/LoopbackModel');
-const hive = 'http://localhost:3100/api';
-const debug = require('debug')('LP:TEST');
+const hiveUrl = 'http://localhost:3100/api';
 
-class CustomLoopbackModel extends LoopbackModel{
-    async merge(){
-        return "this is merge.";
-    }
-}
+chai.use(chaiHttp);
 
-var loopbackAPI = new LoopbackAPI(hive);
-var Leads = loopbackAPI.getModel('Leads');
-var Users = loopbackAPI.getUser('Users');
-var Admins = loopbackAPI.getUser('Admins');
-var Translations = loopbackAPI.getModel('Translations');
-var Custom = new CustomLoopbackModel('Leads', loopbackAPI);
+// Init
+let loopbackAPI = new LoopbackAPI(hiveUrl);
+let Admins = loopbackAPI.getUser('Admins');
+let Leads = loopbackAPI.getModel('Leads');
 
-async function initTestsAgents(){
-    var result = await Users.login('string@live.it', 'ciao');
-    debug('token: ', loopbackAPI.accessToken);
-
-    debug('testing create...');
-    debug('token translations: ', Translations.loopbackApi.accessToken);
-    result = await Translations.create({
-        code: 'XYZ',
-        valueIt: 'XYZ IT',
-        valueEn: 'XYZ EN'
+/*
+ * LoopbackUserModel login.
+ */
+describe('LoopbackUserModel login', () => {
+    it('it should login in', async () => {
+        let response = await Admins.login('stefano.giurgiano@heres.ai', 'console20.');
+        response.should.be.a('object');
+        response.should.have.property('id');
     });
+});
 
-    debug('testing findById...');
-    result = await Translations.findById(111);
-
-    debug('testing count...');
-    result = await Translations.count({});
-
-    debug('testing find...');
-    result = await Translations.find({
-        where: {
-            code: 'XYZ'
-        }
+/*
+ * LoopbackModel create, find, count, findOne updateById.
+ * create, find, deleteById, delete, logout
+ */
+describe('LoopbackModel create', () => {
+    it('it should create a new record', async () => {
+        let lead = await Leads.create({
+            source: 'chat',
+            chatId: 'XYZ'
+        });
+        lead.should.be.a('object');
+        lead.should.have.property('id');
+        describe('LoopbackModel find', () => {
+            it('it should find a record', async () => {
+                let foundedLead = await Leads.findById(lead.id);
+                foundedLead.should.be.a('object');
+                foundedLead.should.have.property('id');
+                // foundedLead.should.to.deep.equal(lead);
+            });
+        });
+        describe('LoopbackModel count', () => {
+            it('it should count a record', async () => {
+                let response = await Leads.count({id: lead.id});
+                response.should.be.a('object');
+                response.should.have.property('count');
+                response.count.should.to.equal(1);
+            });
+        });
+        describe('LoopbackModel findOne', () => {
+            it('it should fine one a record', async () => {
+                let response = await Leads.findOne({where: {id: lead.id}});
+                response.should.be.a('object');
+                response.should.have.property('id');
+            });
+        });
+        describe('LoopbackModel updateById', () => {
+            it('it should update by id a record', async () => {
+                let updatedLead = await Leads.updateById(lead.id, {firstName: 'Testing'});
+                updatedLead.should.be.a('object');
+                updatedLead.should.have.property('id');
+                updatedLead.firstName.should.to.equal('Testing');
+            });
+        });
     });
-
-    debug('testing findOne...');
-    result = await Translations.findOne({
-        where: {
-            id: 13
-        }
-    });
-
-    debug('testing updateById...');
-    result = await Translations.updateById(1, {firstName: 'Testing'});
-
-    debug('testing deleteById...');
-    result = await Translations.deleteById(12);
-
-    debug('testing update...');
-    result = await Translations.update({
-        id: {
-            gt: 11
-        }
-    }, {code: "TESTING"});
-
-    await Translations.delete({id: {gte: 8}});
-
-    return true;
-}
-
-async function initTestsUser(){
-    debug('login..');
-    var result = await Admins.login('string@live.it', 'ciao');
-    debug('token: ', loopbackAPI.accessToken);
-    await Users.logout();
-}
-
-async function initTests(){
-    var result;
-    debug('testing create...');
-    result = await Leads.create({
-        source: 'chat',
-        chatId: 'XYZ'
-    });
-
-    debug('testing findById...');
-    result = await Leads.findById(111);
-
-    debug('testing count...');
-    result = await Leads.count({});
-
-    debug('testing find...');
-    result = await Leads.find({
-        where: {
-            chatId: 'XYZ123'
-        }
-    });
-
-    debug('testing findOne...');
-    result = await Leads.findOne({
-        where: {
-            id: 13
-        }
-    });
-
-    debug('testing updateById...');
-    result = await Leads.updateById(1, {firstName: 'Testing'});
-
-    debug('testing deleteById...');
-    result = await Leads.deleteById(12);
-
-    debug('testing update...');
-    result = await Leads.update({
-        id: {
-            gt: 11
-        }
-    }, {firstName: "TESTING"});
-
-    debug('testing customModel...');
-    await Custom.merge();
-
-    await Leads.delete({id: {gte: 8}});
-
-    return true;
-}
-
-initTestsUser().then(() => {
-    return;
 });
